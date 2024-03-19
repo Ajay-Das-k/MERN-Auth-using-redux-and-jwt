@@ -26,6 +26,7 @@ const rejisterUser = asyncHandler(async(req,res)=>{
       name,email,phone,password
    })
    if(user){
+      genarateToken(res,user._id)
       res.status(201).json({
          _id:user._id,
          name:user.name,
