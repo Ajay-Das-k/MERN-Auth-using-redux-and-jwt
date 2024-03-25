@@ -10,6 +10,8 @@ import {
   updateAdminProfilePic,
   listAllUsers,
   deleteUser,
+  editUser,
+  updateUserProfilePic,
 } from "../Controllers/adminController.js";
 import { protectAdmin } from "../middleWare/authMiddleWareAdmin.js"
 
@@ -29,5 +31,13 @@ router.put(
 );  
 router.get("/listAllUsers", protectAdmin,listAllUsers);
 router.delete("/deleteUser/:id", protectAdmin, deleteUser);
+router.put("/edit-user/:id", protectAdmin, editUser);
+router.put(
+  "/userProfilePic/:id",
+  uploadUser.single("image"),
+  userImgResize,
+  protectAdmin,
+  updateUserProfilePic
+);
 
 export default router;

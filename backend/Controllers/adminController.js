@@ -190,15 +190,59 @@ const deleteUser = asyncHandler(async (req, res) => {
 // @access Private
 const editUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  try { 
-    const deleteData = await User.findByIdAndDelete(id); 
-    res.status(200).json({ message: "User Delete successfully" });
+  const { name, email, phone, password } = req.body;
+  // console.log(req.body,"//////////////////////////");
+
+  try {
+    // Find the user by id
+    const user = await User.findById(id);
+
+    if (!user) {
+      res.status(404);
+      throw new Error("User not found");
+    }
+
+    // Update user's information
+    user.name = name || user.name;
+    user.email = email || user.email;
+    user.phone = phone || user.phone;
+    user.password = password || user.password;
+
+    // Save the updated user
+    const updatedUser = await user.save();
+
+    res
+      .status(200)
+      .json({ message: "User edited successfully", user: updatedUser });
   } catch (error) {
-    throw new Error(error);
+    res
+      .status(500)
+      .json({ message: "Error editing user", error: error.message });
   }
 });
 
+//@desc update user profilePic
+// route PUT /api/admins//userProfilePic/:id
+// @access Private
+const updateUserProfilePic= asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const user= await User.findById(id);
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+  const oldImageFilename = user.image;
+  user.image = req.file.filename;
+  const updatedUser = await user.save();
+  if (oldImageFilename) {
+    await deleteImage(oldImageFilename);
+  }
 
+  res.status(200).json({
+    _id: updatedUser._id,
+    image: updatedUser.image,
+  });
+});
 
 export {
   authAdmin,
@@ -210,4 +254,5 @@ export {
   listAllUsers,
   deleteUser,
   editUser,
+  updateUserProfilePic,
 };
