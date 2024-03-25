@@ -9,6 +9,7 @@ import {
   updateAdminProfile,
   updateAdminProfilePic,
   listAllUsers,
+  deleteUser,
 } from "../Controllers/adminController.js";
 import { protectAdmin } from "../middleWare/authMiddleWareAdmin.js"
 
@@ -27,5 +28,6 @@ router.put(
   updateAdminProfilePic
 );  
 router.get("/listAllUsers", protectAdmin,listAllUsers);
+router.delete("/deleteUser/:id", protectAdmin, deleteUser);
 
 export default router;

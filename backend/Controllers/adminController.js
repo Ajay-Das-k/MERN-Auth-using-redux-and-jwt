@@ -165,11 +165,37 @@ const updateAdminProfilePic = asyncHandler(async (req, res) => {
 });
 
 //@desc Get all userprofiles
-// route GET /api/admins/profile
+// route GET /api/admin/listAllUser
 // @access Private
 const listAllUsers = asyncHandler(async (req, res) => {
   const users = await User.find();
   res.status(200).json(users);
+});
+
+//@desc delete user
+// route GET /api/admin/deleteUser/:id
+// @access Private
+const deleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try { 
+    const deleteData = await User.findByIdAndDelete(id); 
+    res.status(200).json({ message: "User Delete successfully" });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+//@desc Edit USer
+// route GET /api/admin/deleteUser/:id
+// @access Private
+const editUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try { 
+    const deleteData = await User.findByIdAndDelete(id); 
+    res.status(200).json({ message: "User Delete successfully" });
+  } catch (error) {
+    throw new Error(error);
+  }
 });
 
 
@@ -182,4 +208,6 @@ export {
   updateAdminProfile,
   updateAdminProfilePic,
   listAllUsers,
+  deleteUser,
+  editUser,
 };
