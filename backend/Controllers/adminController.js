@@ -244,6 +244,45 @@ const updateUserProfilePic= asyncHandler(async (req, res) => {
   });
 });
 
+
+//@desc Rejister A new aUser
+// route POST/api/admin/createUser
+// @access Public
+const rejisterUser = asyncHandler(async (req, res) => {
+  const { name, email, phone, password } = req.body;
+  console.log(req.body,req.file.filename,"00000000000000000000000000");
+  const image = req.file.filename;
+  const userExist = await User.findOne({ email: email });
+
+  if (userExist) {
+    res.status(400);
+    throw new Error("User already exists");
+  }
+
+  const user= await User.create({
+    name,
+    email,
+    phone,
+    password,
+    image,
+  });
+
+  if (user) {
+    // Send response with status 201 and user data
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      image: user.image, // Use userimage instead of image variable
+    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid admin data");
+  }
+});
+
+
 export {
   authAdmin,
   rejisterAdmin,
@@ -255,4 +294,5 @@ export {
   deleteUser,
   editUser,
   updateUserProfilePic,
+  rejisterUser,
 };
