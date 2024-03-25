@@ -2,6 +2,7 @@ import express  from "express";
 dotenv.config()
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import morgan from "morgan";
 import { notFound,errorHandler } from "./middleWare/errorMiddleWare.js";
 import connectDB from "./config/dbConnect.js";
 import  userRoutes from './routes/userRoutes.js'
@@ -14,6 +15,7 @@ connectDB()
 
 const app = express();
 
+app.use(morgan("dev"))
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 

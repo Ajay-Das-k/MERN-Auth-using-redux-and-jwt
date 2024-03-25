@@ -1,4 +1,24 @@
 import asyncHandler from "express-async-handler"
+
+import fs from "fs";import path from "path";
+import express from "express";
+const __dirname = path.resolve();
+const app = express();
+const publicPath = path.join(__dirname, "backend", "public");
+app.use(express.static(publicPath));
+const deleteImage = (oldImageFilename) => {
+  fs.unlink(
+    path.join(publicPath, "images", "userProfile", oldImageFilename),
+    (err) => {
+      if (err) {
+        console.error(`Error deleting old image: ${err.message}`);
+      } else {
+        console.log("Old image deleted successfully");
+      }
+    }
+  );
+};
+
 import genarateToken from "../utils/generateToken.js";
 import User from '../model/userModel.js'
 
@@ -15,6 +35,7 @@ const authUser = asyncHandler(async(req,res)=>{
        name: user.name,
        email: user.email,
        phone: user.phone,
+       image: user.image,
      });
    } else {
      res.status(401);
@@ -27,33 +48,40 @@ const authUser = asyncHandler(async(req,res)=>{
 //@desc Rejister A new User
 // route POST/api/users
 // @access Public
-const rejisterUser = asyncHandler(async(req,res)=>{
-   // console.log(req.body);
-   const {name,email,phone,password}=req.body
-   const userExist=await User.findOne({email:email})
-   if(userExist){
-      res.status(400)
-      throw new Error('User Already Exist')
-   }
-   const user=await User.create({
-      name,email,phone,password
-   })
-   if(user){
-      genarateToken(res,user._id)
-      res.status(201).json({
-         _id:user._id,
-         name:user.name,
-         email:user.email,
-         phone:user.phone
+const rejisterUser = asyncHandler(async (req, res) => {
+  const { name, email, phone, password } = req.body;
+  const image = req.file.filename;
 
-      });
-      }else{
-         res.status(400)
-      throw new Error(' Invalid User Data')
-      }
-   
-  res.status(200).json({message:"Rejister User"})
+  const userExist = await User.findOne({ email: email });
+  if (userExist) {
+    res.status(400);
+    throw new Error("User already exists");
+  }
+
+  const user = await User.create({
+    name,
+    email,
+    phone,
+    password,
+    image,
+  });
+
+  if (user) {
+    // Send response with status 201 and user data
+    genarateToken(res, user._id);
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      image: user.image, // Use user.image instead of image variable
+    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid user data");
+  }
 });
+
 
 
 
@@ -72,12 +100,13 @@ const logoutUser = asyncHandler(async(req,res)=>{
 // route GET /api/users/profile
 // @access Private
 const getUserProfile = asyncHandler(async(req,res)=>{
-   const user ={
-      _id:req.user._id,
-      name:req.user.name,
-      email:req.user.email,
-      phone:req.user.phone
-   }
+   const user = {
+     _id: req.user._id,
+     name: req.user.name,
+     email: req.user.email,
+     phone: req.user.phone,
+     image: req.user.image,
+   };
   res.status(200).json(user)
 });
 
@@ -108,14 +137,45 @@ const updateUserProfile = asyncHandler(async(req,res)=>{
   }
 });
 
+//@desc update User profilePic
+// route PUT /api/users/profilePic
+// @access Private
+const updateUserProfilePic = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  // Store the old image filename temporarily
+  const oldImageFilename = user.image;
+
+  // Update the user's image with the new filename
+  user.image = req.file.filename;
+  const updatedUser = await user.save();
+
+  // Delete the old image file from the server
+  if (oldImageFilename) {
+    await deleteImage(oldImageFilename);
+  }
+
+  res.status(200).json({
+    _id: updatedUser._id,
+    image: updatedUser.image,
+  });
+});
 
 
 
 export {
-   authUser,
-   rejisterUser,
-   logoutUser,
-   getUserProfile,
-   updateUserProfile,
+  authUser,
+  rejisterUser,
+  logoutUser,
+  getUserProfile,
+  updateUserProfile,
+  updateUserProfilePic,
+};
 
-}
+
+
+

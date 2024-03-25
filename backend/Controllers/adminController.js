@@ -2,6 +2,28 @@ import asyncHandler from "express-async-handler";
 import genarateToken from "../utils/generateTokenAdmin.js";
 import Admin from "../model/adminModel.js";
 
+import fs from "fs";
+import path from "path";
+import express from "express";
+const __dirname = path.resolve();
+const app = express();
+const publicPath = path.join(__dirname, "backend", "public");
+app.use(express.static(publicPath));
+const deleteImage = (oldImageFilename) => {
+  fs.unlink(
+    path.join(publicPath, "images", "userProfile", oldImageFilename),
+    (err) => {
+      if (err) {
+        console.error(`Error deleting old image: ${err.message}`);
+      } else {
+        console.log("Old image deleted successfully");
+      }
+    }
+  );
+};
+
+
+
 //@desc Auth admin/set token
 // route POST/api/admins/auth
 // @access Public
@@ -26,34 +48,38 @@ const authAdmin = asyncHandler(async (req, res) => {
 // route POST/api/admins
 // @access Public
 const rejisterAdmin = asyncHandler(async (req, res) => {
-  // console.log(req.body);
   const { name, email, phone, password } = req.body;
+  const image = req.file.filename;
   const adminExist = await Admin.findOne({ email: email });
+
   if (adminExist) {
     res.status(400);
-    throw new Error("admin Already Exist");
+    throw new Error("Admin already exists");
   }
+
   const admin = await Admin.create({
     name,
     email,
     phone,
     password,
+    image,
   });
+
   if (admin) {
-    genarateToken(res, admin._id);
+    // Send response with status 201 and admin data
     res.status(201).json({
       _id: admin._id,
       name: admin.name,
       email: admin.email,
       phone: admin.phone,
+      image: admin.image, // Use admin.image instead of image variable
     });
   } else {
     res.status(400);
-    throw new Error(" Invalid admin Data");
+    throw new Error("Invalid admin data");
   }
-
-  res.status(200).json({ message: "Rejister admin" });
 });
+
 
 //@desc Logout a admin
 // route POST /api/admins/logout
@@ -104,6 +130,34 @@ const updateAdminProfile = asyncHandler(async (req, res) => {
     throw new Error("Admin not found");
   }
 });
+//@desc update Admin profilePic
+// route PUT /api/admins/profilePic
+// @access Private
+const updateAdminProfilePic = asyncHandler(async (req, res) => {
+  const admin = await Admin.findById(req.admin._id);
+  if (!admin) {
+    res.status(404);
+    throw new Error("Admin not found");
+  }
+
+  // Store the old image filename temporarily
+  const oldImageFilename = admin.image;
+
+  // Update the admin's image with the new filename
+  admin.image = req.file.filename;
+  const updatedAdmin = await admin.save();
+
+  // Delete the old image file from the server
+  if (oldImageFilename) {
+    await deleteImage(oldImageFilename);
+  }
+
+  res.status(200).json({
+    _id: updatedAdmin._id,
+    image: updatedAdmin.image,
+  });
+});
+
 
 export {
   authAdmin,
@@ -111,4 +165,5 @@ export {
   logoutAdmin,
   getAdminProfile,
   updateAdminProfile,
+  updateAdminProfilePic,
 };
