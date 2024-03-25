@@ -1,10 +1,15 @@
 import asyncHandler from "express-async-handler";
-import genarateToken from "../utils/generateTokenAdmin.js";
-import Admin from "../model/adminModel.js";
-
 import fs from "fs";
 import path from "path";
 import express from "express";
+
+import genarateToken from "../utils/generateTokenAdmin.js";
+
+// DB Seq
+import Admin from "../model/adminModel.js";
+import User from "../model/userModel.js";
+
+// deleteImage  using fs
 const __dirname = path.resolve();
 const app = express();
 const publicPath = path.join(__dirname, "backend", "public");
@@ -80,7 +85,6 @@ const rejisterAdmin = asyncHandler(async (req, res) => {
   }
 });
 
-
 //@desc Logout a admin
 // route POST /api/admins/logout
 // @access Public
@@ -105,7 +109,7 @@ const getAdminProfile = asyncHandler(async (req, res) => {
   res.status(200).json(admin);
 });
 
-//@desc update admin profile
+//@desc update admin profile 
 // route PUT /api/admins/profile
 // @access Private
 const updateAdminProfile = asyncHandler(async (req, res) => {
@@ -130,6 +134,8 @@ const updateAdminProfile = asyncHandler(async (req, res) => {
     throw new Error("Admin not found");
   }
 });
+
+
 //@desc update Admin profilePic
 // route PUT /api/admins/profilePic
 // @access Private
@@ -158,6 +164,15 @@ const updateAdminProfilePic = asyncHandler(async (req, res) => {
   });
 });
 
+//@desc Get all userprofiles
+// route GET /api/admins/profile
+// @access Private
+const listAllUsers = asyncHandler(async (req, res) => {
+  const users = await User.find();
+  res.status(200).json(users);
+});
+
+
 
 export {
   authAdmin,
@@ -166,4 +181,5 @@ export {
   getAdminProfile,
   updateAdminProfile,
   updateAdminProfilePic,
+  listAllUsers,
 };

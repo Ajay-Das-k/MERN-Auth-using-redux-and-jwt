@@ -1,7 +1,12 @@
 import asyncHandler from "express-async-handler"
-
-import fs from "fs";import path from "path";
+import fs from "fs";
+import path from "path";
 import express from "express";
+
+import genarateToken from "../utils/generateToken.js";
+import User from "../model/userModel.js";
+
+// delete image using fs
 const __dirname = path.resolve();
 const app = express();
 const publicPath = path.join(__dirname, "backend", "public");
@@ -19,8 +24,7 @@ const deleteImage = (oldImageFilename) => {
   );
 };
 
-import genarateToken from "../utils/generateToken.js";
-import User from '../model/userModel.js'
+
 
 //@desc Auth user/set token
 // route POST/api/users/auth
@@ -42,8 +46,6 @@ const authUser = asyncHandler(async(req,res)=>{
      throw new Error("Invalid email or password");
    }
 });
-
-
 
 //@desc Rejister A new User
 // route POST/api/users
@@ -81,9 +83,6 @@ const rejisterUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid user data");
   }
 });
-
-
-
 
 //@desc Logout a User
 // route POST /api/users/logout

@@ -8,6 +8,7 @@ import {
   getAdminProfile,
   updateAdminProfile,
   updateAdminProfilePic,
+  listAllUsers,
 } from "../Controllers/adminController.js";
 import { protectAdmin } from "../middleWare/authMiddleWareAdmin.js"
 
@@ -18,7 +19,6 @@ router
   .route("/profile")
   .get(protectAdmin, getAdminProfile)
   .put(protectAdmin, updateAdminProfile);
-
 router.put(
   "/profilePic",
   uploadUser.single("image"),
@@ -26,5 +26,6 @@ router.put(
   protectAdmin,
   updateAdminProfilePic
 );  
+router.get("/listAllUsers", protectAdmin,listAllUsers);
 
 export default router;
