@@ -191,26 +191,18 @@ const deleteUser = asyncHandler(async (req, res) => {
 const editUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { name, email, phone, password } = req.body;
-  // console.log(req.body,"//////////////////////////");
-
   try {
-    // Find the user by id
     const user = await User.findById(id);
 
     if (!user) {
       res.status(404);
       throw new Error("User not found");
     }
-
-    // Update user's information
     user.name = name || user.name;
     user.email = email || user.email;
     user.phone = phone || user.phone;
     user.password = password || user.password;
-
-    // Save the updated user
     const updatedUser = await user.save();
-
     res
       .status(200)
       .json({ message: "User edited successfully", user: updatedUser });
@@ -250,7 +242,7 @@ const updateUserProfilePic= asyncHandler(async (req, res) => {
 // @access Public
 const rejisterUser = asyncHandler(async (req, res) => {
   const { name, email, phone, password } = req.body;
-  console.log(req.body,req.file.filename,"00000000000000000000000000");
+  // console.log(req.body,req.file.filename,"00000000000000000000000000");
   const image = req.file.filename;
   const userExist = await User.findOne({ email: email });
 
@@ -268,13 +260,12 @@ const rejisterUser = asyncHandler(async (req, res) => {
   });
 
   if (user) {
-    // Send response with status 201 and user data
     res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
       phone: user.phone,
-      image: user.image, // Use userimage instead of image variable
+      image: user.image, 
     });
   } else {
     res.status(400);
