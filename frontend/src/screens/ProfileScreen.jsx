@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-// import { Link, useNavigate } from 'react-router-dom';
-import { Form, Button } from "react-bootstrap";
+import { Link, useNavigate } from 'react-router-dom';
+import { Form, Button, Row, Col, FormGroup } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import FormContainer from "../Components/FormContainer";
 import { toast } from "react-toastify";
@@ -9,10 +9,13 @@ import { useUpdateUserMutation } from "../slices/usersApiSlice";
 import { setCredentials } from "../slices/authSlice";
 
 const ProfileScreen = () => {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
+ const [name, setName] = useState("");
+ const [email, setEmail] = useState("");
+ const [phone, setPhone] = useState("");
+ const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [profilePicture, setProfilePicture] = useState(null);
+
 
   const dispatch = useDispatch();
 
@@ -23,7 +26,9 @@ const ProfileScreen = () => {
   useEffect(() => {
     setName(userInfo.name);
     setEmail(userInfo.email);
-  }, [userInfo.email, userInfo.name]);
+    setPhone(userInfo.phone);
+    setProfilePicture(userInfo.image)
+  }, [userInfo.email, userInfo.name, userInfo.phone,userInfo.image]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -34,6 +39,7 @@ const ProfileScreen = () => {
         const res = await updateProfile({
           _id: userInfo._id,
           name,
+          phone,
           email,
           password,
         }).unwrap();
@@ -59,6 +65,17 @@ const ProfileScreen = () => {
             onChange={(e) => setName(e.target.value)}
           ></Form.Control>
         </Form.Group>
+
+        <FormGroup className="my-3" controlId="Phone">
+          <Form.Label>Phone</Form.Label>
+          <Form.Control
+            type="tel"
+            placeholder="Enter your Phone Number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          ></Form.Control>
+        </FormGroup>
+
         <Form.Group className="my-2" controlId="email">
           <Form.Label>Email Address</Form.Label>
           <Form.Control

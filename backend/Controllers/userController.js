@@ -128,7 +128,10 @@ const updateUserProfile = asyncHandler(async(req,res)=>{
       _id:updatedUser._id,
       name:updatedUser.name,
       email:updatedUser.email,
-      phone:updatedUser.phone
+      phone:updatedUser.phone,
+      image:updatedUser.image,
+
+
    })
   }else{
    res.status(404)
