@@ -21,15 +21,19 @@ const Header = () => {
 
   const [logoutApiCall] = useLogoutMutation();
 
-  const logoutHandler = async () => {
-    try {
-      await logoutApiCall().unwrap();
-      dispatch(logout());
-      navigate("/login");
-    } catch (err) {
-      console.error(err);
+const logoutHandler = async () => {
+  try {
+    await logoutApiCall().unwrap();
+    dispatch(logout());
+    if (userInfo.isAdmin) {
+      navigate("/admin"); // Navigate to /admin if user is admin
+    } else {
+      navigate("/login"); // Navigate to /login if user is not admin
     }
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   return (
     <header>
@@ -70,6 +74,11 @@ const Header = () => {
                     <NavDropdown.Item onClick={logoutHandler}>
                       Logout
                     </NavDropdown.Item>
+                    {userInfo.isAdmin && ( 
+                      <LinkContainer to="/admin/dashboard">
+                        <NavDropdown.Item>User Dashboard</NavDropdown.Item>
+                      </LinkContainer>
+                    )}
                   </NavDropdown>
                 </>
               ) : (

@@ -42,6 +42,8 @@ const authAdmin = asyncHandler(async (req, res) => {
       name: admin.name,
       email: admin.email,
       phone: admin.phone,
+      isAdmin: true,
+      image:admin.image,
     });
   } else {
     res.status(401);
@@ -77,6 +79,8 @@ const rejisterAdmin = asyncHandler(async (req, res) => {
       name: admin.name,
       email: admin.email,
       phone: admin.phone,
+      image: admin.image,
+      isAdmin: true,
       image: admin.image, // Use admin.image instead of image variable
     });
   } else {
@@ -105,6 +109,8 @@ const getAdminProfile = asyncHandler(async (req, res) => {
     name: req.admin.name,
     email: req.admin.email,
     phone: req.admin.phone,
+    isAdmin: true,
+    image: admin.image,
   };
   res.status(200).json(admin);
 });
