@@ -22,7 +22,9 @@ This project is a full-stack authentication system built using the MERN stack (M
 Navigate to the project directory:
 
    ```bash
-cd mern-auth-redux-jwt
+   cd mern-auth-redux-jwt
 
- ## dfgdf
+## fgfgf
+
+
 
